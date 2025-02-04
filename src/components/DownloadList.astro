@@ -1,0 +1,28 @@
+---
+import { getReleases } from "../lib/db";
+
+interface Release {
+  id: string;
+  version: string;
+  release_date: string;
+  metadata?: string;
+  platform_type: "Windows" | "Mac" | "Linux";
+  download_url: string;
+}
+
+const releases: Release[] = await getReleases();
+---
+
+<ul class="mt-4">
+  {
+    releases.map((release) => (
+      <li class="p-4 bg-yellow-500 text-black my-2 rounded shadow-lg">
+          <h2 class="text-xl font-semibold">{release.version} - {release.platform_type}</h2>
+        <p>Released: {new Date(release.release_date).toLocaleDateString()}</p>
+        <a class="text-white underline" href={release.download_url}>
+          Download
+        </a>
+      </li>
+    ))
+  }
+</ul>

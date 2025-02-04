@@ -1,0 +1,90 @@
+---
+import { getReleases } from "../lib/db";
+
+interface Release {
+  id: number;
+  platform_type: "Windows" | "Mac" | "Linux";
+  version: string;
+  metadata?: string;
+  release_date: string;
+  download_url: string;
+}
+
+// Fetch releases once at build time
+const releases: Release[] = await getReleases();
+
+// Group releases by platform
+const platforms = ["Windows", "Mac", "Linux"];
+const releasesByPlatform = platforms.map(platform => ({
+  platform,
+  releases: releases.filter(release => release.platform_type === platform)
+}));
+---
+
+<div class="grid px-12 grid-cols-1 md:grid-cols-3 gap-8 p-6">
+    {releasesByPlatform.map(({ platform, releases }) => (
+      <div class="p-6 bg-gray-800 text-white rounded-lg shadow-lg flex flex-col justify-between min-h-[250px]">
+        <div>
+          <h2 class="text-2xl font-bold text-center">{platform}</h2>
+          <p class="text-gray-400 text-center mt-1">Select a version to download</p>
+        </div>
+  
+        <!-- Dropdown for selecting version -->
+        <div class="mt-4">
+          <label for={`version-select-${platform}`} class="block text-sm font-semibold text-gray-300">Select Version:</label>
+          <select id={`version-select-${platform}`} class="w-full p-2 bg-gray-800 text-yellow-500 rounded border border-yellow-500 mt-1">
+            {releases.map((release) => (
+              <option value={release.version} data-metadata={release.metadata}>{release.version}</option>
+            ))}
+          </select>
+        </div>
+  
+        <!-- Metadata Display -->
+        <div id={`metadata-${platform}`} class="text-gray-400 text-sm mt-2 bg-gray-800 p-3 rounded hidden">
+          <!-- Metadata will be inserted here dynamically -->
+        </div>
+  
+        <!-- Download button -->
+        <button id={`download-button-${platform}`} class="mt-4 w-full py-2 bg-yellow-500 text-black font-bold rounded-lg shadow-md transition-transform transform hover:scale-105">
+          Download me
+        </button>
+      </div>
+    ))}
+  </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const releaseDataElement = document.getElementById("release-data") as HTMLPreElement | null;
+    if (!releaseDataElement) return;
+
+    const releases: { platform_type: string; version: string; download_url: string }[] =
+      JSON.parse(releaseDataElement.textContent || "[]");
+
+    ["Windows", "Mac", "Linux"].forEach((platform) => {
+      const selectElement = document.getElementById(`version-select-${platform}`) as HTMLSelectElement | null;
+      const downloadButton = document.getElementById(`download-button-${platform}`) as HTMLButtonElement | null;
+
+      if (!selectElement || !downloadButton) return; // Ensure elements exist before proceeding
+
+      function updateDownloadUrl() {
+        const selectedVersion = selectElement?.value;
+        const release = releases.find((r) => r.platform_type === platform && r.version === selectedVersion);
+
+        if (release && downloadButton) {
+          downloadButton.onclick = () => {
+            window.location.href = release.download_url;
+          };
+        }
+      }
+
+      // Set initial download URL
+      updateDownloadUrl();
+
+      // Update download link on version change
+      selectElement.addEventListener("change", updateDownloadUrl);
+    });
+  });
+</script>
+
+<!-- Store releases as JSON for client-side updates -->
+<pre id="release-data" hidden>{JSON.stringify(releases)}</pre>
