@@ -1,0 +1,29 @@
+---
+interface NavItem {
+  name: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { name: "Features", href: "#" },
+  { name: "Solutions", href: "#" },
+  { name: "Resources", href: "#" },
+  { name: "Pricing", href: "#" },
+  { name: "Docs", href: "#" },
+  { name: "Support", href: "#" }
+];
+---
+
+<nav class="flex justify-center py-8">
+  <div class="bg-cream text-black flex gap-x-8 px-8 py-3 rounded-full shadow-md">
+    {navItems.map((item) => (
+      <a href={item.href} class="font-medium hover:underline">{item.name}</a>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .bg-cream {
+    background-color: #fdf6e3;
+  }
+</style>

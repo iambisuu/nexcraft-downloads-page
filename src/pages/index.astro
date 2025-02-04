@@ -1,13 +1,15 @@
 ---
 import Hero from '../components/Hero.astro';
-import Navbar from '../components/Navbar.astro';
+import NewNavbar from '../components/NewNavbar.astro';
 import ReleasesDropdown from "../components/ReleasesDropdown.astro"
+import OlderVersions from "../components/OlderVersions.astro"
 ---
 
 <html>
-  <body class="bg-[#ffe900] text-black min-h-screen">
-    <Navbar />
+  <body class="bg-yellow-400 text-black min-h-screen">
+    <NewNavbar />
     <Hero />
     <ReleasesDropdown/>
+	<OlderVersions />
   </body>
 </html>
