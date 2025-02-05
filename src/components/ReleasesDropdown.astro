@@ -25,100 +25,114 @@ function formatDate(dateString: string) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 ---
+<style>
+  /* Mobile-first approach: Stack boxes in a single column */
+  #download-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
 
-<div id="download-container" class="grid px-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6 items-end">
-    {releasesByPlatform.map(({ platform, releases }, index) => (
-      <div
-        id={`box-${platform}`}
-        class={`p-6 rounded-lg flex flex-col justify-between bg-gradient-to-b transition-all hover:scale-105 ${
-          index === 1 ? "from-black to-black sm:min-h-[450px]" : "from-gray-800 to-gray-700"
-        }`}
-      >
-        <!-- Platform Header -->
-        <div class="flex flex-col items-center">
-          <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gray-700 mb-4">
-            <div class="w-8 h-8 flex-shrink-0">
-              <img
-                src={`/${platform.toLowerCase()}.png`}
-                alt={`${platform} icon`}
-                class="w-full h-full object-contain"
-              />
-            </div>
+  /* Desktop layout: Use flex with equal spacing */
+  @media (min-width: 768px) {
+    #download-container {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div id="download-container" class="px-6 p-6 md:w-full md:max-w-screen-lg mx-auto">
+  {releasesByPlatform.map(({ platform, releases }, index) => (
+    <div
+      id={`box-${platform}`}
+      class="p-8 rounded-lg flex flex-col justify-between bg-white text-black transition-all hover:scale-105 w-full max-w-xs sm:max-w-sm md:max-w-full mx-auto md:w-auto flex-1 border border-gray-300 min-h-[550px]"
+    >
+      <!-- Platform Header -->
+      <div class="flex flex-col items-center">
+        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-gray-300 mb-4">
+          <div class="w-10 h-10 flex-shrink-0">
+            <img
+              src={`/${platform.toLowerCase()}.png`}
+              alt={`${platform} icon`}
+              class="w-full h-full object-contain"
+            />
           </div>
-          <h2 class="text-3xl font-bold text-white">{platform}</h2>
-          <p class="text-gray-300 text-center mt-1">
-            {platform === "Mac"
-              ? "Most popular for creatives"
-              : platform === "Windows"
-              ? "Perfect for gamers and developers"
-              : "Best for stability and customization"}
-          </p>
         </div>
-  
-        <!-- Latest Version and Metadata -->
-        <div class="bg-gray-900 text-gray-300 rounded-lg p-4 mt-4">
-          <p class="text-sm">
-            <strong>Latest Version:</strong>{" "}
-            {releases.length > 0 ? releases[0].version : "Not available"}
-          </p>
-          <p class="text-sm mt-2">
-            <strong>Release Date:</strong>{" "}
-            {releases.length > 0 ? formatDate(releases[0].release_date) : "Not available"}
-          </p>
-          <p class="text-xs text-gray-500 mt-2">
-            {releases.length > 0 ? releases[0].metadata : "Metadata not provided for this release."}
-          </p>
-        </div>
-  
-        <!-- Download Button -->
-        <button
-          id={`download-button-${platform}`}
-          class="mt-6 w-full py-3 bg-yellow-400 text-black font-bold rounded-lg transition-transform transform hover:scale-105"
-        >
-          Download Now 
-        </button>
+        <h2 class="text-4xl font-bold text-black">{platform}</h2>
+        <p class="text-gray-700 text-center mt-2 text-lg">
+          {platform === "Mac"
+            ? "Most popular for creatives"
+            : platform === "Windows"
+            ? "Perfect for gamers and developers"
+            : "Best for stability and customization"}
+        </p>
       </div>
-    ))}
-  </div>
-  
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const releaseDataElement = document.getElementById("release-data");
-      if (!releaseDataElement) return;
-      
-      const releases = JSON.parse(releaseDataElement.textContent || "[]");
-  
-      function getUserOS() {
-        const platform = navigator.platform.toLowerCase();
-        if (platform.includes("win")) return "Windows";
-        if (platform.includes("mac")) return "Mac";
-        if (platform.includes("linux")) return "Linux";
-        return null;
+
+      <!-- Latest Version and Metadata -->
+      <div class="bg-gray-200 text-black rounded-lg p-5 mt-5">
+        <p class="text-base">
+          <strong>Latest Version:</strong>{" "}
+          {releases.length > 0 ? releases[0].version : "Not available"}
+        </p>
+        <p class="text-base mt-3">
+          <strong>Release Date:</strong>{" "}
+          {releases.length > 0 ? formatDate(releases[0].release_date) : "Not available"}
+        </p>
+        <p class="text-sm text-gray-600 mt-3">
+          {releases.length > 0 ? releases[0].metadata : "Metadata not provided for this release."}
+        </p>
+      </div>
+
+      <!-- Download Button -->
+      <button
+        id={`download-button-${platform}`}
+        class="mt-6 w-full py-4 bg-black text-white text-lg font-bold rounded-lg transition-transform transform hover:scale-105"
+      >
+        Download Now
+      </button>
+    </div>
+  ))}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const releaseDataElement = document.getElementById("release-data");
+    if (!releaseDataElement) return;
+
+    const releases = JSON.parse(releaseDataElement.textContent || "[]");
+
+    function getUserOS() {
+      const platform = navigator.platform.toLowerCase();
+      if (platform.includes("win")) return "Windows";
+      if (platform.includes("mac")) return "Mac";
+      if (platform.includes("linux")) return "Linux";
+      return null;
+    }
+
+    const userOS = getUserOS();
+    if (userOS) {
+      const osBox = document.getElementById(`box-${userOS}`);
+      if (osBox) {
+        osBox.classList.add("sm:translate-y-[-20px]");
       }
-  
-      const userOS = getUserOS();
-      if (userOS) {
-        const osBox = document.getElementById(`box-${userOS}`);
-        if (osBox) {
-          osBox.classList.add("sm:translate-y-[-20px]");
-        }
+    }
+
+    ["Windows", "Mac", "Linux"].forEach(platform => {
+      const downloadButton = document.getElementById(`download-button-${platform}`);
+      if (!downloadButton) return;
+      const latestRelease = releases.find(
+        (r: { platform_type: string; download_url: string; }) => r.platform_type === platform
+      );
+      if (latestRelease) {
+        downloadButton.onclick = () => {
+          window.location.href = latestRelease.download_url;
+        };
       }
-  
-      ["Windows", "Mac", "Linux"].forEach(platform => {
-        const downloadButton = document.getElementById(`download-button-${platform}`);
-        if (!downloadButton) return;
-        const latestRelease = releases.find(
-          (r: { platform_type: string; download_url: string; }) => r.platform_type === platform
-        );
-        if (latestRelease) {
-          downloadButton.onclick = () => {
-            window.location.href = latestRelease.download_url;
-          };
-        }
-      });
     });
-  </script>
-  
-  
-  <!-- Store releases as JSON for client-side updates -->
-  <pre id="release-data" hidden>{JSON.stringify(releases)}</pre>
+  });
+</script>
+
+<!-- Store releases as JSON for client-side updates -->
+<pre id="release-data" hidden>{JSON.stringify(releases)}</pre>
