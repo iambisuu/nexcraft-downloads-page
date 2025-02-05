@@ -3,7 +3,7 @@ interface Version {
   version: string;
   releaseDate: string;
   changelog: string;
-  downloadUrl: string;
+  fileName: string;
 }
 
 const previousVersions: Version[] = [
@@ -11,64 +11,68 @@ const previousVersions: Version[] = [
     version: "2.5.1",
     releaseDate: "January 15, 2024",
     changelog: "Bug fixes and performance improvements.",
-    downloadUrl: "#"
+    fileName: "version-2.5.1.zip",
   },
   {
     version: "2.4.3",
     releaseDate: "November 28, 2023",
     changelog: "New features added, UI enhancements.",
-    downloadUrl: "#"
+    fileName: "version-2.4.3.zip",
   },
   {
     version: "2.3.0",
     releaseDate: "September 10, 2023",
     changelog: "Security updates and optimizations.",
-    downloadUrl: "#"
-  }
+    fileName: "version-2.3.0.zip",
+  },
 ];
+
+let selectedVersion: Version = previousVersions[0];
 ---
-
-<section class="bg-yellow-400 py-12 text-black text-center">
-  <h2 class="text-4xl font-bold mb-4">Older Versions</h2>
-
-  <!-- Button to trigger version history -->
-  <div class="inline-block relative group">
-    <button 
-      class="border-2 border-black px-6 py-3 rounded-lg font-bold text-lg transition-all hover:bg-black hover:text-yellow-400"
-      id="view-versions-btn"
-    >
-      View Previous Versions
-    </button>
-
-    <!-- Hidden box that appears on hover -->
-    <div 
-      id="older-versions"
-      class="absolute left-1/2 transform -translate-x-1/2 mt-4 w-[80vw] text-white p-6 rounded-lg opacity-0 scale-y-0 origin-top transition-all duration-300 group-hover:opacity-100 group-hover:scale-y-100"
-    >
-      <div class="flex justify-center gap-6">
-        {previousVersions.map((version) => (
-          <div class="bg-gray-800 text-white p-4 rounded-lg shadow-md w-64 transition-transform transform hover:scale-105">
-            <h3 class="text-xl font-semibold">Version {version.version}</h3>
-            <p class="text-gray-400 text-sm">{version.releaseDate}</p>
-            <p class="mt-3 text-gray-300">{version.changelog}</p>
-            <a href={version.downloadUrl} class="mt-3 inline-block bg-yellow-400 text-black font-bold py-2 px-4 rounded-md hover:bg-yellow-300 transition-all">
-              Download
-            </a>
-          </div>
-        ))}
+<div class=" my-20 text-[4rem] font-light w-screen justify-center items-center flex">Older Versions</div>
+<section class="flex my-28 mt-16 w-[40rem] mx-auto bg-white text-black font-mono shadow-lg rounded-lg overflow-hidden border border-gray-300">
+    <!-- Left Sidebar: Folder Structure -->
+    <aside class="w-34 bg-gray-100 border-r border-gray-300 p-3">
+      <h3 class="text-xs text-gray-600 mb-2">Older Versions</h3>
+      <ul id="version-list">
+        {
+          previousVersions.map((version) => (
+            <li
+              class="cursor-pointer px-2 py-1 rounded-md text-xs hover:bg-gray-200"
+              data-version={version.version}
+            >
+              V {version.version}
+            </li>
+          ))
+        }
+      </ul>
+    </aside>
+  
+    <!-- Main Content: Fake VS Code Editor -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header: File Name and Date -->
+      <div class="bg-gray-200 flex justify-between items-center px-4 py-2 border-b border-gray-300">
+        <span class="text-blue-600 text-xs" id="file-name">{selectedVersion.fileName}</span>
+        <span class="text-purple-600 text-xs" id="release-date">{selectedVersion.releaseDate}</span>
+      </div>
+  
+      <!-- Code Editor Panel -->
+      <pre class="bg-white text-green-700 text-sm px-6 py-4 text-left whitespace-pre-wrap h-28 overflow-auto" id="changelog">
+  {`// Changelog for v${selectedVersion.version}
+  ${selectedVersion.changelog}`}
+      </pre>
+  
+      <!-- Terminal: Fake Download Command -->
+      <div class="bg-gray-100 px-6 py-3 border-t border-gray-300 text-left text-sm">
+        <span class="text-green-600">user@device:~$</span> 
+        <span class="text-gray-800"> curl -O </span>
+        <a class="text-blue-500 cursor-pointer hover:underline" id="download-btn"
+           href={`/downloads/${selectedVersion.fileName}`} download={selectedVersion.fileName}>
+          https://example.com/downloads/{selectedVersion.fileName}
+        </a>
+        <br>
+        <span class="text-green-600">user@device:~$</span> echo "Downloading {selectedVersion.fileName}..."
+        <span class="text-green-600">user@device:~$</span> tar -xzf {selectedVersion.fileName} && cd {selectedVersion.fileName.replace(".zip", "")}
       </div>
     </div>
-  </div>
-</section>
-<script>
-  const viewVersionsBtn = document.getElementById("view-versions-btn");
-  const olderVersions = document.getElementById("older-versions");
-
-  if (viewVersionsBtn && olderVersions) {
-    viewVersionsBtn.addEventListener("mouseenter", function () {
-      setTimeout(() => {
-        olderVersions.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 200); // Delay to match animation
-    });
-  }
-</script>
+  </section>
